@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuestForge - Test Configuration</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #0f172a;
+            --bg-secondary: #1e293b;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-size: 1.125rem;
+        }
+
+        .test-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .test-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .status.pending {
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .status.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .status.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: var(--bg);
+            border-radius: 8px;
+            border: 1px solid transparent;
+        }
+
+        .test-item.success {
+            border-color: var(--success);
+        }
+
+        .test-item.error {
+            border-color: var(--danger);
+        }
+
+        .test-label {
+            font-weight: 500;
+        }
+
+        .test-result {
+            font-family: monospace;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .code-block {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: var(--text);
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        .alert.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+
+        .alert.info {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test de Configuration QuestForge</h1>
+        <p class="subtitle">Vérifiez que votre configuration Supabase est correcte avant de lancer l'application</p>
+
+        <!-- Section : Configuration -->
+        <div class="test-section">
+            <h2>
+                📝 Configuration
+                <span class="status pending" id="configStatus">En attente</span>
+            </h2>
+            <div id="configTests"></div>
+            <button onclick="testConfiguration()">Tester la configuration</button>
+        </div>
+
+        <!-- Section : Connexion Supabase -->
+        <div class="test-section">
+            <h2>
+                🔌 Connexion Supabase
+                <span class="status pending" id="connectionStatus">En attente</span>
+            </h2>
+            <div id="connectionTests"></div>
+            <button onclick="testConnection()" id="connectionBtn">Tester la connexion</button>
+        </div>
+
+        <!-- Section : Tables de la base de données -->
+        <div class="test-section">
+            <h2>
+                🗄️ Structure de la base de données
+                <span class="status pending" id="databaseStatus">En attente</span>
+            </h2>
+            <div class="alert warning">
+                ⚠️ Assurez-vous d'avoir exécuté le script SQL <code>questforge-setup.sql</code> avant ce test
+            </div>
+            <div id="databaseTests"></div>
+            <button onclick="testDatabase()" id="databaseBtn">Tester la structure</button>
+        </div>
+
+        <!-- Section : Instructions -->
+        <div class="test-section">
+            <h2>📚 Prochaines étapes</h2>
+            <div id="nextSteps">
+                <p style="color: var(--text-secondary);">Exécutez les tests ci-dessus pour voir les prochaines étapes</p>
+            </div>
+        </div>
+    </div>
+    <script src="./js/config.js"></script>
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        let supabase = null;
+        const results = {
+            config: false,
+            connection: false,
+            database: false
+        };
+
+        function displayTest(containerId, label, status, details = '') {
+            const container = document.getElementById(containerId);
+            const testItem = document.createElement('div');
+            testItem.className = `test-item ${status}`;
+            testItem.innerHTML = `
+                <span class="test-label">${status === 'success' ? '✓' : '✗'} ${label}</span>
+                <span class="test-result">${details}</span>
+            `;
+            container.appendChild(testItem);
+        }
+
+        function updateStatus(statusId, status, text) {
+            const statusEl = document.getElementById(statusId);
+            statusEl.className = `status ${status}`;
+            statusEl.textContent = text;
+        }
+
+        function showNextSteps() {
+            const container = document.getElementById('nextSteps');
+            
+            if (results.config && results.connection && results.database) {
+                container.innerHTML = `
+                    <div class="alert info">
+                        <strong>✅ Tous les tests sont passés !</strong><br><br>
+                        Votre configuration est correcte. Vous pouvez maintenant :
+                        <ol style="margin-top: 12px; padding-left: 20px;">
+                            <li>Fermer cette page</li>
+                            <li>Ouvrir <code>auth.html</code> pour créer un compte</li>
+                            <li>Commencer à utiliser QuestForge ! 🎯</li>
+                        </ol>
+                    </div>
+                `;
+            } else {
+                const issues = [];
+                if (!results.config) issues.push('Configuration incomplète');
+                if (!results.connection) issues.push('Problème de connexion');
+                if (!results.database) issues.push('Base de données non configurée');
+                
+                container.innerHTML = `
+                    <div class="alert warning">
+                        <strong>⚠️ Tests incomplets</strong><br><br>
+                        Problèmes détectés : ${issues.join(', ')}<br><br>
+                        Consultez le fichier <code>INSTALLATION-GUIDE.md</code> pour plus d'informations.
+                    </div>
+                `;
+            }
+        }
+
+        window.testConfiguration = function() {
+            const container = document.getElementById('configTests');
+            container.innerHTML = '';
+            
+            // Test 1: Vérifier que SUPABASE_CONFIG existe
+            if (typeof SUPABASE_CONFIG === 'undefined') {
+                displayTest('configTests', 'Variable SUPABASE_CONFIG', 'error', 'Non trouvée');
+                updateStatus('configStatus', 'error', 'Erreur');
+                return;
+            }
+            
+            displayTest('configTests', 'Variable SUPABASE_CONFIG', 'success', 'Trouvée');
+            
+            // Test 2: Vérifier l'URL
+            if (!SUPABASE_CONFIG.url || SUPABASE_CONFIG.url === '') {
+                displayTest('configTests', 'URL Supabase', 'error', 'Non configurée');
+                updateStatus('configStatus', 'error', 'Erreur');
+                return;
+            }
+            
+            displayTest('configTests', 'URL Supabase', 'success', SUPABASE_CONFIG.url);
+            
+            // Test 3: Vérifier la clé
+            if (!SUPABASE_CONFIG.anonKey || SUPABASE_CONFIG.anonKey.includes('YOUR_')) {
+                displayTest('configTests', 'Clé API', 'error', 'Non configurée ou invalide');
+                updateStatus('configStatus', 'error', 'Erreur');
+                return;
+            }
+            
+            if (!SUPABASE_CONFIG.anonKey.startsWith('eyJ')) {
+                displayTest('configTests', 'Format de la clé', 'error', 'Doit commencer par eyJ');
+                updateStatus('configStatus', 'error', 'Erreur');
+                return;
+            }
+            
+            displayTest('configTests', 'Clé API', 'success', 'Configurée');
+            displayTest('configTests', 'Format de la clé', 'success', 'Valide');
+            
+            results.config = true;
+            updateStatus('configStatus', 'success', 'OK');
+            showNextSteps();
+        };
+
+        window.testConnection = async function() {
+            if (!results.config) {
+                alert('Veuillez d\'abord tester la configuration !');
+                return;
+            }
+            
+            const btn = document.getElementById('connectionBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Test en cours...';
+            
+            const container = document.getElementById('connectionTests');
+            container.innerHTML = '';
+            
+            try {
+                // Créer le client Supabase
+                supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+                displayTest('connectionTests', 'Client Supabase', 'success', 'Créé');
+                
+                // Test de connexion basique
+                const { data, error } = await supabase.from('profiles').select('count').limit(0);
+                
+                if (error) {
+                    if (error.code === '42P01') {
+                        displayTest('connectionTests', 'Connexion au serveur', 'success', 'OK');
+                        displayTest('connectionTests', 'Table profiles', 'error', 'Table non trouvée');
+                        updateStatus('connectionStatus', 'warning', 'Tables manquantes');
+                    } else {
+                        throw error;
+                    }
+                } else {
+                    displayTest('connectionTests', 'Connexion au serveur', 'success', 'OK');
+                    displayTest('connectionTests', 'Accès aux tables', 'success', 'OK');
+                    results.connection = true;
+                    updateStatus('connectionStatus', 'success', 'OK');
+                }
+                
+            } catch (error) {
+                displayTest('connectionTests', 'Connexion', 'error', error.message);
+                updateStatus('connectionStatus', 'error', 'Erreur');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Retester la connexion';
+                showNextSteps();
+            }
+        };
+
+        window.testDatabase = async function() {
+            if (!supabase) {
+                alert('Veuillez d\'abord tester la connexion !');
+                return;
+            }
+            
+            const btn = document.getElementById('databaseBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Test en cours...';
+            
+            const container = document.getElementById('databaseTests');
+            container.innerHTML = '';
+            
+            const tables = [
+                'profiles',
+                'custom_quests',
+                'quest_history',
+                'category_stats',
+                'completed_quest_ids'
+            ];
+            
+            let allTablesExist = true;
+            
+            for (const table of tables) {
+                try {
+                    const { error } = await supabase.from(table).select('count').limit(0);
+                    
+                    if (error) {
+                        if (error.code === '42P01') {
+                            displayTest('databaseTests', `Table: ${table}`, 'error', 'Non trouvée');
+                            allTablesExist = false;
+                        } else {
+                            throw error;
+                        }
+                    } else {
+                        displayTest('databaseTests', `Table: ${table}`, 'success', 'Trouvée');
+                    }
+                } catch (error) {
+                    displayTest('databaseTests', `Table: ${table}`, 'error', error.message);
+                    allTablesExist = false;
+                }
+            }
+            
+            if (allTablesExist) {
+                results.database = true;
+                updateStatus('databaseStatus', 'success', 'OK');
+            } else {
+                updateStatus('databaseStatus', 'error', 'Tables manquantes');
+                
+                container.innerHTML += `
+                    <div class="alert warning" style="margin-top: 16px;">
+                        <strong>⚠️ Tables manquantes détectées</strong><br><br>
+                        Exécutez le script <code>questforge-setup.sql</code> dans Supabase :<br>
+                        1. Ouvrez Supabase Dashboard<br>
+                        2. Allez dans SQL Editor<br>
+                        3. Collez le contenu de questforge-setup.sql<br>
+                        4. Cliquez sur "Run"
+                    </div>
+                `;
+            }
+            
+            btn.disabled = false;
+            btn.textContent = 'Retester la structure';
+            showNextSteps();
+        };
+
+        // Test automatique de la configuration au chargement
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                testConfiguration();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

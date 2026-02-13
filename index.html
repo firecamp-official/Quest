@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuestForge - Forge ta Légende</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation principale -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="brand">
+                <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <span class="brand-name">QuestForge</span>
+            </div>
+            <button id="logoutBtn" class="logout-btn" aria-label="Déconnexion">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Camp de base (profil utilisateur) -->
+    <section class="basecamp">
+        <div class="basecamp-container">
+            <!-- Progression circulaire -->
+            <div class="progress-ring-container">
+                <svg class="progress-ring" viewBox="0 0 160 160">
+                    <circle class="progress-ring-bg" cx="80" cy="80" r="70" />
+                    <circle id="progressCircle" class="progress-ring-fill" cx="80" cy="80" r="70" />
+                </svg>
+                <div class="progress-center">
+                    <div class="level-badge">
+                        <span class="level-number" id="userLevel">1</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info joueur -->
+            <div class="player-info">
+                <h1 class="player-name" id="username">Explorateur</h1>
+                <div class="player-title" id="userTitle">Novice</div>
+                
+                <!-- XP détails -->
+                <div class="xp-details">
+                    <span id="xpText" class="xp-label">0 / 100 XP</span>
+                </div>
+
+                <!-- Streak feu -->
+                <div class="streak-container">
+                    <div class="flame-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2C12 2 7 6 7 11c0 2.8 2.2 5 5 5s5-2.2 5-5c0-5-5-9-5-9z" fill="url(#flameGradient)" stroke="none"/>
+                            <defs>
+                                <linearGradient id="flameGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#ff6b35;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#f7931e;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <span class="streak-count" id="userStreak">0</span>
+                    <span class="streak-label">jours</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Navigation par onglets -->
+    <div class="tab-navigation">
+        <button class="tab-btn active" data-tab="quests">
+            <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+            </svg>
+            <span>Quêtes</span>
+        </button>
+        <button class="tab-btn" data-tab="custom">
+            <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v8M8 12h8"/>
+            </svg>
+            <span>Créer</span>
+        </button>
+        <button class="tab-btn" data-tab="stats">
+            <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3v18h18"/>
+                <path d="M18 17V9M13 17v-6M8 17v-3"/>
+            </svg>
+            <span>Stats</span>
+        </button>
+    </div>
+
+    <!-- ONGLET QUÊTES -->
+    <section id="questsTab" class="tab-content active">
+        <div class="content-container">
+            <!-- Filtres -->
+            <div class="quest-filters">
+                <select id="categoryFilter" class="filter-select">
+                    <option value="all">Toutes catégories</option>
+                    <option value="santé">Santé</option>
+                    <option value="mental">Mental</option>
+                    <option value="créativité">Créativité</option>
+                    <option value="social">Social</option>
+                    <option value="discipline">Discipline</option>
+                    <option value="apprentissage">Apprentissage</option>
+                </select>
+                
+                <select id="difficultyFilter" class="filter-select">
+                    <option value="all">Toute difficulté</option>
+                    <option value="facile">Facile</option>
+                    <option value="moyen">Moyen</option>
+                    <option value="difficile">Difficile</option>
+                    <option value="expert">Expert</option>
+                </select>
+
+                <button id="generateDaily" class="btn-action btn-generate">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0118.8-4.3M22 12.5a10 10 0 01-18.8 4.2"/>
+                    </svg>
+                    Nouvelles
+                </button>
+            </div>
+
+            <!-- Liste des quêtes -->
+            <div id="questsList" class="quest-grid"></div>
+        </div>
+    </section>
+
+    <!-- ONGLET CRÉATION -->
+    <section id="customTab" class="tab-content">
+        <div class="content-container">
+            <div class="create-header">
+                <h2 class="section-title">Forger une quête</h2>
+                <p class="section-subtitle">Crée ta propre aventure personnelle</p>
+            </div>
+
+            <form class="quest-form">
+                <div class="form-field">
+                    <label class="form-label">Titre</label>
+                    <input 
+                        type="text" 
+                        id="customTitle" 
+                        class="form-input" 
+                        placeholder="Méditer au lever du soleil..."
+                    />
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Description</label>
+                    <textarea 
+                        id="customDescription" 
+                        class="form-textarea" 
+                        placeholder="Décris ta quête, ton objectif..."
+                        rows="3"
+                    ></textarea>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label class="form-label">Catégorie</label>
+                        <select id="customCategory" class="form-select">
+                            <option value="santé">Santé</option>
+                            <option value="mental">Mental</option>
+                            <option value="créativité">Créativité</option>
+                            <option value="social">Social</option>
+                            <option value="discipline">Discipline</option>
+                            <option value="apprentissage">Apprentissage</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Difficulté</label>
+                        <select id="customDifficulty" class="form-select">
+                            <option value="facile">Facile</option>
+                            <option value="moyen">Moyen</option>
+                            <option value="difficile">Difficile</option>
+                            <option value="expert">Expert</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Durée (min)</label>
+                        <input 
+                            type="number" 
+                            id="customDuration" 
+                            class="form-input" 
+                            min="5" 
+                            max="240" 
+                            value="30"
+                        />
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Impact</label>
+                        <select id="customImpact" class="form-select">
+                            <option value="faible">Faible</option>
+                            <option value="moyen" selected>Moyen</option>
+                            <option value="élevé">Élevé</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="button" id="createCustomQuest" class="btn-action btn-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Forger la quête
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- ONGLET STATS -->
+    <section id="statsTab" class="tab-content">
+        <div class="content-container">
+            <h2 class="section-title">Statistiques</h2>
+
+            <!-- Cartes stats principales -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 11l3 3L22 4"/>
+                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="totalQuests">0</div>
+                    <div class="stat-label">Quêtes réussies</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="totalXP">0</div>
+                    <div class="stat-label">XP totale</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon flame">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2C12 2 7 6 7 11c0 2.8 2.2 5 5 5s5-2.2 5-5c0-5-5-9-5-9z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="bestStreak">0</div>
+                    <div class="stat-label">Meilleure série</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="8" r="7"/>
+                            <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="dominantCategory">—</div>
+                    <div class="stat-label">Dominante</div>
+                </div>
+            </div>
+
+            <!-- Répartition par catégorie -->
+            <div class="stats-section">
+                <h3 class="stats-section-title">Répartition par domaine</h3>
+                <div id="categoryBreakdown" class="category-breakdown"></div>
+            </div>
+
+            <!-- Historique -->
+            <div class="stats-section">
+                <h3 class="stats-section-title">Dernières quêtes</h3>
+                <div id="questHistory" class="quest-history"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Toast notifications -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./js/questsData.js"></script>
+    <script src="./js/questGenerator.js"></script>
+    <script src="./js/gameSystem.js"></script>
+    <script src="./js/app-supabase.js"></script>
+</body>
+</html>
